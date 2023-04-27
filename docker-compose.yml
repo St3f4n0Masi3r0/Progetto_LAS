@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+    WebServer1:
+        build: webservers/bulbasaur
+        image: bulbasaur
+        container_name: bulbasaur
+        networks:
+            - Internal
+        restart: unless-stopped
+    WebServer2:
+        build: webservers/charmander
+        image: charmander
+        container_name: charmander
+        networks:
+            - Internal
+        restart: unless-stopped
+    WebServer3:
+        build: webservers/pikachu
+        image: pikachu
+        container_name: pikachu
+        networks:
+            - Internal
+        restart: unless-stopped
+    WebServer4:
+        build: webservers/ditto
+        image: ditto
+        container_name: ditto
+        networks:
+            - Internal
+        restart: unless-stopped
+    LoadBalancer:
+        build: loadbalancer/ashketchum/
+        image: ashketchum
+        container_name: ashketchum
+        networks:
+            - Internal
+            - External
+        ports:
+            - "80:80"
+        depends_on:
+            - WebServer1
+            - WebServer2
+            - WebServer3
+            - WebServer4
+        restart: unless-stopped
+    
+
+networks:
+    Internal:
+        internal: true
+    External:
