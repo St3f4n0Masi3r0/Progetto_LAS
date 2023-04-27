@@ -1,5 +1,5 @@
 # From base image node
-FROM node:19-buster-slim
+FROM node:current-alpine3.17
 
 WORKDIR /usr/src/app
 

@@ -5,7 +5,7 @@ const HOST = '0.0.0.0'
 
 // App
 app.get('/', (req, res) => {
-  res.send('This is squirtle')
+  res.send('This is squirtle, the debug pokemon')
 });
 
 app.listen(PORT, HOST)

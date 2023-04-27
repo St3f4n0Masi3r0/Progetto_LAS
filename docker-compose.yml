@@ -29,6 +29,13 @@ services:
         networks:
             - Internal
         restart: unless-stopped
+    WebServer5:
+        build: webservers/squirtle
+        image: squirtle
+        container_name: squirtle
+        networks:
+            - Internal
+        restart: unless-stopped
     LoadBalancer:
         build: loadbalancer/ashketchum/
         image: ashketchum
