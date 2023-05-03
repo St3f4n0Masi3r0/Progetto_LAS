@@ -1,3 +1,4 @@
 FROM nginx:alpine
 COPY contents/nginx.conf /etc/nginx/nginx.conf
-#COPY contents/static/ /var/www/example.com/ da correggere
+COPY contents/static/ /var/www/example.com/static
+#da correggere

@@ -1,12 +1,16 @@
-const express = require('express')
-const app = express()
-const PORT = 8080
-const HOST = '0.0.0.0'
+const express = require('express');
+const app = express();
 
-// App
+// Serve static files
+app.use(express.static('public'));
+
+// Route for the HTML page
 app.get('/', (req, res) => {
-  res.send('This is ditto')
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-app.listen(PORT, HOST)
-console.log(`Our app running on http://${HOST}:${PORT}`)
+// Start the server
+const port = 8080;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
