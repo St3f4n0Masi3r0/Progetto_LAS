@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+    webserver1:
+        build: webserver/
+        image: webserver1
+        container_name: webserver1
+        networks:
+            - Internal
+        restart: unless-stopped
+
+    webserver2:
+        build: webserver/
+        image: webserver2
+        container_name: webserver2
+        networks:
+            - Internal
+        restart: unless-stopped
+    
+
+    loadbalancer:
+        build: loadbalancer/
+        image: loadbalancer
+        container_name: loadbalancer
+        networks:
+            - Internal
+            - External
+        ports:
+            - "80:80"
+        depends_on:
+            - webserver1
+        restart: unless-stopped
+
+    mongodb:
+      build: mongodb
+      image: mongodb
+      container_name: mongodb
+      ports:
+        - "27017:27017"
+      networks:
+        - Internal
+        - External
+
+
+networks:
+    Internal:
+        internal: true
+    External:
