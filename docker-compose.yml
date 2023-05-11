@@ -1,57 +1,91 @@
 version: "3"
 
 services:
-    WebServer1:
-        build: webservers/bulbasaur
-        image: bulbasaur
-        container_name: bulbasaur
+    webserver1:
+        build: webserver/
+        image: webserver
+        container_name: webserver1
         networks:
             - Internal
         restart: unless-stopped
-    WebServer2:
-        build: webservers/charmander
-        image: charmander
-        container_name: charmander
+
+    webserver2:
+        build: webserver/
+        image: webserver
+        container_name: webserver2
         networks:
             - Internal
         restart: unless-stopped
-    WebServer3:
-        build: webservers/pikachu
-        image: pikachu
-        container_name: pikachu
-        networks:
-            - Internal
-        restart: unless-stopped
-    WebServer4:
-        build: webservers/ditto
-        image: ditto
-        container_name: ditto
-        networks:
-            - Internal
-        restart: unless-stopped
-    WebServer5:
-        build: webservers/squirtle
-        image: squirtle
-        container_name: squirtle
-        networks:
-            - Internal
-        restart: unless-stopped
-    LoadBalancer:
-        build: loadbalancer/ashketchum/
-        image: ashketchum
-        container_name: ashketchum
+    
+
+    loadbalancer:
+        build: loadbalancer/
+        image: loadbalancer
+        container_name: loadbalancer
         networks:
             - Internal
             - External
         ports:
             - "80:80"
         depends_on:
-            - WebServer1
-            - WebServer2
-            - WebServer3
-            - WebServer4
+            - webserver1
         restart: unless-stopped
-    
+
+    mongodb1:
+        container_name: mongodb1
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
+
+    mongodb2:
+        container_name: mongodb2
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
+
+    mongodb3:
+        container_name: mongodb3
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal    
+
+    # mongosetup:
+    #     image: "mongosetup"
+    #     build: "./mongosetup"
+    #     container_name: "mongosetup"
+    #     depends_on:
+    #         #- mongodb1
+    #         - mongodb2
+    #         - mongodb3
+    #     networks:
+    #         - Internal
 
 networks:
     Internal:
