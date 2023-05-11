@@ -3,7 +3,7 @@ version: "3"
 services:
     webserver1:
         build: webserver/
-        image: webserver1
+        image: webserver
         container_name: webserver1
         networks:
             - Internal
@@ -11,7 +11,7 @@ services:
 
     webserver2:
         build: webserver/
-        image: webserver2
+        image: webserver
         container_name: webserver2
         networks:
             - Internal
@@ -31,16 +31,61 @@ services:
             - webserver1
         restart: unless-stopped
 
-    mongodb:
-      build: mongodb
-      image: mongodb
-      container_name: mongodb
-      ports:
+    mongodb1:
+        container_name: mongodb1
+        image: mongo
+        restart: always
+        ports:
         - "27017:27017"
-      networks:
-        - Internal
-        - External
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
 
+    mongodb2:
+        container_name: mongodb2
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
+
+    mongodb3:
+        container_name: mongodb3
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal    
+
+    # mongosetup:
+    #     image: "mongosetup"
+    #     build: "./mongosetup"
+    #     container_name: "mongosetup"
+    #     depends_on:
+    #         #- mongodb1
+    #         - mongodb2
+    #         - mongodb3
+    #     networks:
+    #         - Internal
 
 networks:
     Internal:
