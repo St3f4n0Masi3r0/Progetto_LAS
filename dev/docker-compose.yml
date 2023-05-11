@@ -2,9 +2,10 @@ version: "3"
 services:
   node:
     container_name: dev-node
-    build: test/.
-    # volumes:
-    #   - ./node/test/:/usr/src/app
+    build: test/
     ports:
       - "4200:4200"
+    volumes:
+      - /app/node_modules
+      #- .test/:/usr/src/app
 
