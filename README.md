@@ -11,3 +11,5 @@ Docker
 - docker-compose down --rmi all -v --remove-orphans
 Angular
 - ng serve --open
+npm install -g typescript 
+npm install -g @angular/cli

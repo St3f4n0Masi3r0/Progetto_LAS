@@ -1,0 +1,10 @@
+version: "3"
+services:
+  node:
+    container_name: dev-node
+    build: test/.
+    # volumes:
+    #   - ./node/test/:/usr/src/app
+    ports:
+      - "4200:4200"
+
