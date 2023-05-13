@@ -40,7 +40,7 @@ services:
         command: mongod --replSet rs0 --port 27017 --bind_ip_all
         healthcheck:
             test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-            interval: 120s
+            interval: 10s
             start_period: 30s
             timeout: 60s
         networks:
@@ -74,18 +74,65 @@ services:
             start_period: 30s
             timeout: 60s
         networks:
-            - Internal    
+            - Internal 
 
-    # mongosetup:
-    #     image: "mongosetup"
-    #     build: "./mongosetup"
-    #     container_name: "mongosetup"
-    #     depends_on:
-    #         #- mongodb1
-    #         - mongodb2
-    #         - mongodb3
-    #     networks:
-    #         - Internal
+    nginx-prometheus-exporter:
+        image: nginx/nginx-prometheus-exporter
+        ports:
+        - 9113:9113
+        environment:
+            SCRAPE_URI: http://loadbalancer/metrics
+            NGINX_RETRIES: 10
+        networks:
+        - Internal
+        depends_on:
+            - loadbalancer
+    
+    mongodb-exporter:
+        image: bitnami/mongodb-exporter
+        container_name: mongodb-exporter
+        restart: always
+        ports:
+        - "9216:9216"
+        environment:
+        - MONGODB_URI=mongodb://mongodb1:27017,mongodb2:27017,mongodb3:27017/?replicaSet=rs0
+        networks:
+        - Internal
+        depends_on:
+            - mongodb1
+            - mongodb2
+            - mongodb3
+
+    prometheus:
+        image: prom/prometheus
+        ports:
+        - 9090:9090
+        networks:
+        - Internal
+        volumes:
+        - ./monitoring/promethus:/etc/prometheus
+        command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        depends_on:
+            - nginx-prometheus-exporter
+            - mongodb-exporter
+
+    grafana:
+        image: grafana/grafana
+        container_name: grafana
+        restart: unless-stopped
+        ports:
+        - "3000:3000"
+        networks:
+        - Internal
+        - External
+        environment:
+        - GF_SECURITY_ADMIN_USER=admin
+        - GF_SECURITY_ADMIN_PASSWORD=password
+        volumes:
+        - ./monitoring/grafana:/var/lib/grafana
+        depends_on:
+        - prometheus
 
 networks:
     Internal:
