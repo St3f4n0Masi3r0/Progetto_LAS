@@ -45,8 +45,7 @@ services:
             timeout: 60s
         networks:
             - Internal
-            - External
-
+            
     mongodb2:
         container_name: mongodb2
         image: mongo
@@ -94,7 +93,7 @@ services:
             - loadbalancer
     
     mongodb-exporter:
-        image: percona/mongodb_exporter:2.37.0
+        image: bitnami/mongodb-exporter
         container_name: mongodb-exporter
         restart: always
         ports:
@@ -103,7 +102,6 @@ services:
             - MONGODB_URI=mongodb://mongodb1:27017
         networks:
             - Internal
-            - External
         depends_on:
             - mongodb1
             - mongodb2
@@ -115,7 +113,6 @@ services:
         - 9090:9090
         networks:
         - Internal
-        - External
         volumes:
         - ./monitoring/promethus:/etc/prometheus
         command:
