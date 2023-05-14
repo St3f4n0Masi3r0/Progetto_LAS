@@ -1,14 +1,23 @@
-# From base image node
-FROM node:19-buster-slim
+FROM node:latest as build
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/
 
-COPY package*.json ./
+COPY test_app/ .
 
-RUN npm install
+# Build the Angular application
+RUN npm run build --prod
 
-COPY . .
+# Use Nginx as the base image for exposing the Angular app
+FROM nginx:latest
 
-EXPOSE 8080
+# Remove the default Nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
 
-CMD [ "node", "app.js" ]
+# Copy the custom Nginx configuration
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the Angular build output
+COPY --from=build /usr/src/app/dist/test_app /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
