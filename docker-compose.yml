@@ -6,89 +6,96 @@ services:
         build: webserver/
         image: webserver
         ports:
-        - "80:80"
+        # production server
+        #- "80:80"
+        # debug server
+        - "80:4200"
         volumes:
         - /app/node_modules
         - ./webserver/test_app/:/usr/src/app
-        networks:
-            - Internal
-        restart: unless-stopped
-    
-    webserver2:
-        container_name: webserver2
-        build: webserver/
-        image: webserver
-        ports:
-        - "80:80"
-        volumes:
-        - /app/node_modules
-        - ./webserver/test_app/:/usr/src/app
-        networks:
-            - Internal
-        restart: unless-stopped
-    
-
-    loadbalancer:
-        build: loadbalancer/
-        image: loadbalancer
-        container_name: loadbalancer
         networks:
             - Internal
             - External
-        ports:
-            - "80:80"
-        depends_on:
-            - webserver1
         restart: unless-stopped
-
-    # mongodb1:
-    #     container_name: mongodb1
-    #     image: mongo
-    #     restart: always
+    
+    # webserver2:
+    #     container_name: webserver2
+    #     build: webserver/
+    #     image: webserver
     #     ports:
-    #     - "27017:27017"
-    #     command: mongod --replSet rs0 --port 27017 --bind_ip_all
-    #     healthcheck:
-    #         test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-    #         interval: 10s
-    #         start_period: 30s
-    #         timeout: 60s
+    #     production server
+    #     - "80:80"
+    #     debug server
+    #     - "80:4200"
+    #     volumes:
+    #     - /app/node_modules
+    #     - ./webserver/test_app/:/usr/src/app
     #     networks:
     #         - Internal
+    #     restart: unless-stopped
+    
+
+    # loadbalancer:
+    #     build: loadbalancer/
+    #     image: loadbalancer
+    #     container_name: loadbalancer
+    #     networks:
+    #         - Internal
+    #         - External
+    #     ports:
+    #         - "80:80"
+    #     depends_on:
+    #         - webserver1
+    #     restart: unless-stopped
+
+    mongodb1:
+        container_name: mongodb1
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 10s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
             
-    # mongodb2:
-    #     container_name: mongodb2
-    #     image: mongo
-    #     restart: always
-    #     ports:
-    #     - "27017:27017"
-    #     command: mongod --replSet rs0 --port 27017 --bind_ip_all
-    #     healthcheck:
-    #         test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-    #         interval: 120s
-    #         start_period: 30s
-    #         timeout: 60s
-    #     networks:
-    #         - Internal
-    #     depends_on:
-    #         - mongodb1
+    mongodb2:
+        container_name: mongodb2
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal
+        depends_on:
+            - mongodb1
 
-    # mongodb3:
-    #     container_name: mongodb3
-    #     image: mongo
-    #     restart: always
-    #     ports:
-    #     - "27017:27017"
-    #     command: mongod --replSet rs0 --port 27017 --bind_ip_all
-    #     healthcheck:
-    #         test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-    #         interval: 120s
-    #         start_period: 30s
-    #         timeout: 60s
-    #     networks:
-    #         - Internal 
-    #     depends_on:
-    #         - mongodb1
+    mongodb3:
+        container_name: mongodb3
+        image: mongo
+        restart: always
+        ports:
+        - "27017:27017"
+        command: mongod --replSet rs0 --port 27017 --bind_ip_all
+        healthcheck:
+            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            interval: 120s
+            start_period: 30s
+            timeout: 60s
+        networks:
+            - Internal 
+        depends_on:
+            - mongodb1
 
     # nginx-prometheus-exporter:
     #     image: nginx/nginx-prometheus-exporter
