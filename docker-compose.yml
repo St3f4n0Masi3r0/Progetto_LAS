@@ -7,7 +7,7 @@ services:
         image: webserver
         ports:
         # production server
-        #- "80:80"
+        #- "8080:8080"
         # debug server
         - "80:4200"
         volumes:
@@ -23,10 +23,10 @@ services:
     #     build: webserver/
     #     image: webserver
     #     ports:
-    #     production server
-    #     - "80:80"
-    #     debug server
-    #     - "80:4200"
+    #     #production server
+    #     - "8080:8080"
+    #     # debug server
+    #     # - "80:4200"
     #     volumes:
     #     - /app/node_modules
     #     - ./webserver/test_app/:/usr/src/app
@@ -44,6 +44,9 @@ services:
     #         - External
     #     ports:
     #         - "80:80"
+    #         - "443:443"
+    #     volumes:
+    #     - ./loadbalancer/contents/certificates:/etc/nginx/ssl
     #     depends_on:
     #         - webserver1
     #     restart: unless-stopped
