@@ -1,35 +1,47 @@
-FROM node:latest as build
+# Base image for the backend
+FROM node:latest AS backend
 
-WORKDIR /usr/src/app/
+# Set the working directory for the backend
+WORKDIR /app/backend
 
-COPY test_app/ .
+# Copy the backend files
+COPY backend/ .
 
-##
-##For developing Decomment/Comment the following lines below
-##
-CMD [ "npm", "start" ]
+# Install backend dependencies
+RUN npm install
 
-EXPOSE 4200
+# Expose the backend port
+EXPOSE 3000
 
-##
-##For production Decomment/Comment the following lines below
-##
+# Start the backend server
+CMD ["node", "server.js"]
 
-# Build the Angular application
-#RUN npm run build --prod
 
-## Use Nginx as the base image for exposing the Angular app
-#FROM nginx:latest
+# Base image for the frontend
+FROM node:latest AS frontend
+
+# Set the working directory for the frontend
+WORKDIR /app/frontend
+
+# Copy the frontend files
+COPY frontend/package*.json ./
+COPY frontend .
+
+# Install frontend dependencies
+RUN npm install
+RUN npm run build
+
+# Use Nginx as the web server for serving the frontend
+FROM nginx:latest
+
+# Copy the built frontend files to the Nginx web server directory
+COPY --from=frontend /app/frontend/dist/las-app /usr/share/nginx/html
 
 # Remove the default Nginx configuration
-#RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy the custom Nginx configuration
-#COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the Angular build output
-#COPY --from=build /usr/src/app/dist/test_app /usr/share/nginx/html
-
-# Expose port 80
-#EXPOSE 8080
-
+# Expose the web server port
+EXPOSE 8080
