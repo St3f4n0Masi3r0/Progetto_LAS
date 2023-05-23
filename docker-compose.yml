@@ -52,12 +52,10 @@ services:
         - "27017:27017"
         command: mongod --replSet rs0 --port 27017 --bind_ip_all
         healthcheck:
-            test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27017\"},{_id:2,host:\"mongodb3:27017\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
+            test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongodb1:27017\"},{_id:1,host:\"mongodb2:27018\"},{_id:2,host:\"mongodb3:27019\"}]}).ok || rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
             interval: 10s
             start_period: 30s
             timeout: 60s
-        volumes:
-         - ./mongodb/db1:/data/db
         networks:
             - Internal
             
@@ -66,15 +64,8 @@ services:
         image: mongo
         restart: always
         ports:
-        - "27017:27017"
-        command: mongod --replSet rs0 --port 27017 --bind_ip_all
-        healthcheck:
-            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-            interval: 120s
-            start_period: 30s
-            timeout: 60s
-        volumes:
-         - ./mongodb/db2:/data/db
+        - "27018:27018"
+        command: mongod --replSet rs0 --port 27018 --bind_ip_all
         networks:
             - Internal
         depends_on:
@@ -85,15 +76,8 @@ services:
         image: mongo
         restart: always
         ports:
-        - "27017:27017"
-        command: mongod --replSet rs0 --port 27017 --bind_ip_all
-        healthcheck:
-            test: test $$(echo "rs.status().ok" | mongosh --port 27017 --quiet) -eq 1
-            interval: 120s
-            start_period: 30s
-            timeout: 60s
-        volumes:
-         - ./mongodb/db3:/data/db
+        - "27019:27019"
+        command: mongod --replSet rs0 --port 27019 --bind_ip_all
         networks:
             - Internal 
         depends_on:
