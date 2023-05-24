@@ -56,6 +56,8 @@ services:
             interval: 10s
             start_period: 30s
             timeout: 60s
+        volumes:
+         - ./mongodb/db1:/data/db
         networks:
             - Internal
             
@@ -68,6 +70,8 @@ services:
         command: mongod --replSet rs0 --port 27018 --bind_ip_all
         networks:
             - Internal
+        volumes:
+         - ./mongodb/db2:/data/db
         depends_on:
             - mongodb1
 
@@ -80,6 +84,8 @@ services:
         command: mongod --replSet rs0 --port 27019 --bind_ip_all
         networks:
             - Internal 
+        volumes:
+         - ./mongodb/db3:/data/db
         depends_on:
             - mongodb1
 
