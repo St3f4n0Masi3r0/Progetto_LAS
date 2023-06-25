@@ -17,6 +17,7 @@ app.use(cors());
 mongoose.connect('mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=rs0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  readPreference: 'secondary'
 }).then(() => {
   console.log('Connected to MongoDB');
 }).catch((error) => {
