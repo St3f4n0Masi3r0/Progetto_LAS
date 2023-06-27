@@ -14,7 +14,7 @@ export class AddPersonComponent {
 
   addPerson() {
     const person = { name: this.name, surname: this.surname };
-    this.http.post<any>('http://127.0.0.1/api/person', person).subscribe((response) => {
+    this.http.post<any>('/api/person', person).subscribe((response) => {
       console.log(response); // Display the response in the browser console
       // Process the response as needed
     });
