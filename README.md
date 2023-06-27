@@ -1,5 +1,5 @@
 # Startup Project
-- cd Progetto_Las/
+- cd Progetto_Las/ # move to project folder
 - chmod ugo+rw -R monitoring/grafana # allow grafana to read data volume
 - docker-compose up -d # start all container detached
 
