@@ -25,7 +25,7 @@ export class PeopleListComponent implements OnInit {
   }
 
   deletePerson(id: string) {
-    this.http.delete(`http://127.0.0.1/api/people/${id}`).subscribe(() => {
+    this.http.delete(`/api/people/${id}`).subscribe(() => {
       this.getPeople(); // Fetch updated people list after successful deletion
     });
   }
