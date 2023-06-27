@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
 
   
   ngOnInit() {
-    this.http.get<any>('http://127.0.0.1/api').subscribe((response) => {
+    this.http.get<any>('/api').subscribe((response) => {
       this.message = response.message;
     });
   }
